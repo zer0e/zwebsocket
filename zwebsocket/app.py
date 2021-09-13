@@ -285,7 +285,6 @@ class Zwebsocket(socketserver.BaseRequestHandler):
         if "Sec-WebSocket-Version" not in self.headers or self.headers['Sec-WebSocket-Version'] != 13:
             pass
 
-
     def wave_hand(self, status_code=1000):
         """
         send close frame
@@ -319,8 +318,16 @@ class ZwebsocketApp(object):
 
     def route(self, rule):
         def decorator(f):
-            self.urls[rule] = f
-            return f
+            @functools.wraps(f)
+            def inner(*args, **kwargs):
+                res = f(*args, **kwargs)
+                websocket = kwargs.get("websocket")
+                if websocket:
+                    websocket.finish()
+                return res
+
+            self.urls[rule] = inner
+            return inner
 
         return decorator
 
@@ -361,19 +368,6 @@ class ZwebsocketApp(object):
         server = socketserver.ThreadingTCPServer((host, port), locals()[new_class_name])
         server.serve_forever()
 
-    def auto_finish(self):
-        def decorator(f):
-            @functools.wraps(f)
-            def inner(*args, **kwargs):
-                res = f(*args, **kwargs)
-                websocket = kwargs.get("websocket")
-                if websocket:
-                    websocket.finish()
-                return res
-
-            return inner
-
-        return decorator
 
 
 if __name__ == "__main__":
