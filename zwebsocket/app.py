@@ -367,23 +367,3 @@ class ZwebsocketApp(object):
             exec("{}.multi_thread={}".format(new_class_name, multi_thread))
         server = socketserver.ThreadingTCPServer((host, port), locals()[new_class_name])
         server.serve_forever()
-
-
-
-if __name__ == "__main__":
-    app1 = ZwebsocketApp()
-
-
-    @app1.route('/log')
-    @app1.auto_finish()
-    def test(websocket, data):
-        websocket.send_msg("回复消息：" + data)
-
-
-    app2 = ZwebsocketApp()
-
-
-    @app2.route('/log2')
-    @app2.auto_finish()
-    def test(websocket, data):
-        websocket.send_msg("回复消息：" + data)
