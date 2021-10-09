@@ -247,10 +247,10 @@ class Zwebsocket(socketserver.BaseRequestHandler):
             send_msg += str.encode(chr(data_length))
         elif data_length <= 65535:
             send_msg += struct.pack('b', 126)
-            send_msg += struct.pack('>h', data_length)
+            send_msg += struct.pack('>H', data_length)
         elif data_length <= (2 ^ 64 - 1):
             send_msg += struct.pack('b', 127)
-            send_msg += struct.pack('>q', data_length)
+            send_msg += struct.pack('>Q', data_length)
         else:
             raise RuntimeWarning("payload data to long")
         send_message = send_msg + msg
